@@ -69,7 +69,7 @@ applypilot-project/
 
 ## Environment configuration
 
-From the project root, create local environment files by copying the examples:
+The archive includes `backend/.env` and `frontend/.env` with dummy values so the expected configuration is visible. The backend URI is intentionally a placeholder and will not connect until you replace it with your own exam/test MongoDB Atlas URI. Never commit personal or production credentials. If you prefer to create the files manually, copy the examples:
 
 **Windows PowerShell:**
 
@@ -108,7 +108,7 @@ npm --prefix backend install
 npm --prefix frontend install
 ```
 
-5. Start both servers from the root:
+5. Before starting, replace the dummy `MONGODB_URI` in `backend/.env` with your test MongoDB Atlas connection string. Start both servers from the root:
 
 ```powershell
 npm run dev
