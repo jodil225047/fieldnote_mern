@@ -1,205 +1,295 @@
-APPLYPILOT — FIELDNOTE EDITION
-MERN JOB APPLICATION TRACKER
-========================================
+# ApplyPilot — Your Personal Career Command Center
 
-PROJECT OVERVIEW
-----------------
-ApplyPilot is a full-stack job application tracker built with React, Vite,
-Node.js, Express, Mongoose, and MongoDB Atlas. The Fieldnote Edition uses an
-editorial career-journal interface with a Pipeline Board, Ledger view, follow-up
-warnings, analytics, and a weekly career-action tracker.
+ApplyPilot is a MERN job application tracker presented as **Fieldnote / Career**: an editorial, paper-and-ink career desk inspired by field journals and portfolio workspaces. It uses a warm mineral palette, serif headlines, mono-spaced metadata, a horizontal masthead, an illustrated opportunity map, and a six-lane pipeline board rather than a conventional dark sidebar dashboard. Track applications, follow-ups, status transitions, notes, and career-search analytics. All application records and per-company ID counters are stored in MongoDB Atlas; the frontend does not use mock application records.
 
-PROJECT STRUCTURE
------------------
+## Features
+
+- Dashboard statistics and conversion rates derived from MongoDB records.
+- Server-side company search, status filtering, and sorting.
+- Create, view, edit, and conditionally delete job applications.
+- Atomic, MongoDB-backed per-company IDs (`JA-XXX-001`).
+- Server-enforced status workflow and immutable status history timeline.
+- Follow-up date automatically set to seven calendar days after the applied date; overdue warnings for applications still in `Applied`.
+- Duplicate active application checks and form error feedback.
+- Follow-up Radar with overdue emphasis, CSV export, responsive layouts, accessible labels/focus states, loading and error states.
+- Switchable six-stage Pipeline Board and compact Ledger view, with per-stage counts and quick record actions.
+- Weekly Fieldwork sprint: choose a weekly intention (3, 5, 8, or 10 actions) and log completed career actions. Progress persists in the browser for the current week; it is a personal planning aid, not an application record or backend metric.
+- Opportunity Map, conversion insight note, and rotating monthly visual motif for a more portfolio/editorial feel.
+- API health endpoint reporting MongoDB connectivity.
+
+## Technology stack
+
+- React 18, Vite, React Router, Axios, Lucide React, Recharts dependency available for future charts, regular CSS.
+- Node.js, Express 4, Mongoose, MongoDB Atlas.
+- JavaScript (no TypeScript).
+
+## Project structure
+
+```text
 applypilot-project/
-  frontend/       React application and Vite configuration
-  backend/        Express REST API, Mongoose models, controllers, and routes
-  screenshots/    Instructions for adding screenshots
-  package.json    Root scripts and concurrently dependency
-  README.md       Extended project documentation
-  README.txt      This quick-start guide
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/ (Sidebar, Topbar, cards, forms, filters, timeline, dialogs, loading, toast)
+│   │   ├── pages/ (Dashboard, Applications, ApplicationDetails, NotFound)
+│   │   ├── services/api.js
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── styles.css
+│   ├── .env.example
+│   ├── index.html
+│   └── package.json
+├── backend/
+│   ├── config/db.js
+│   ├── controllers/ (applications and analytics)
+│   ├── middleware/ (error handler and 404 handler)
+│   ├── models/ (Application, Counter)
+│   ├── routes/ (applications, analytics)
+│   ├── utils/ (ID generation, workflow, response helpers)
+│   ├── server.js
+│   ├── .env.example
+│   └── package.json
+├── screenshots/README.md
+├── .gitignore
+├── package.json
+└── README.md
+```
 
-DEPENDENCIES
-------------
-Dependencies are listed in THREE package.json files, rather than one file.
-This is expected for a project with separate frontend and backend applications.
+## Prerequisites
 
-Root package.json:
-  concurrently ^9.1.2
-  Used to run the frontend and backend development servers together.
+- Node.js 20 LTS or newer and npm.
+- A MongoDB Atlas cluster and a database user.
+- Git and VS Code (recommended).
 
-Backend dependencies (backend/package.json):
-  cors       ^2.8.5    Cross-origin requests from the frontend
-  dotenv     ^16.4.7   Load environment variables during local development
-  express    ^4.21.2   HTTP server and REST API routing
-  mongoose   ^8.9.5    MongoDB object modeling and database access
-  nodemon    ^3.1.9    Development dependency; restarts server on file changes
+## MongoDB Atlas setup
 
-Frontend dependencies (frontend/package.json):
-  axios                ^1.7.9   HTTP requests to the backend API
-  lucide-react         ^0.468.0 Icon components
-  react                ^18.3.1  UI library
-  react-dom            ^18.3.1  React DOM rendering
-  react-router-dom     ^7.1.1   Client-side routing
-  recharts             ^2.15.0  Chart library dependency
-  @vitejs/plugin-react ^4.3.4   Vite React integration (development dependency)
-  vite                 ^6.0.7   Frontend dev server and build tool
+1. In MongoDB Atlas, create or choose a cluster and create a database user with read/write access to the database you intend to use.
+2. Under **Network Access**, allow your development IP address. Avoid `0.0.0.0/0` unless you deliberately understand and accept the exposure.
+3. Select **Connect → Drivers → Node.js** and copy the connection string.
+4. Replace the username, password, cluster, and database placeholders as needed. URL-encode special characters in the password.
+5. Keep this URI private. Do not put it in frontend variables, source code, screenshots, or Git commits.
 
-Node.js built-in modules are used where applicable and do not need to be listed
-as external dependencies. npm may resolve compatible patch/minor releases within
-the version ranges above. package-lock.json files, if generated by npm install,
-record the resolved dependency tree.
+## Environment configuration
 
-PREREQUISITES
--------------
-- Node.js 20 LTS or newer (recommended)
-- npm
-- MongoDB Atlas cluster and database user
-- Git (for GitHub and deployment)
+The archive includes `backend/.env` and `frontend/.env` with dummy values so the expected configuration is visible. The backend URI is intentionally a placeholder and will not connect until you replace it with your own exam/test MongoDB Atlas URI. Never commit personal or production credentials. If you prefer to create the files manually, copy the examples:
 
-LOCAL SETUP ON WINDOWS
-----------------------
-1. Extract the project ZIP and open the applypilot-project folder in VS Code.
-2. Create local environment files by copying the examples in PowerShell:
+**Windows PowerShell:**
 
-   Copy-Item backend/.env.example backend/.env
-   Copy-Item frontend/.env.example frontend/.env
+```powershell
+Copy-Item backend/.env.example backend/.env
+Copy-Item frontend/.env.example frontend/.env
+```
 
-3. Edit backend/.env and replace the placeholder MONGODB_URI with your own
-   MongoDB Atlas connection string. Example format:
+Edit `backend/.env` and set your real URI:
 
-   MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@YOUR_CLUSTER/YOUR_DATABASE?retryWrites=true&w=majority
-   PORT=5000
-   NODE_ENV=development
-   CLIENT_URL=http://localhost:5173
+```dotenv
+MONGODB_URI=mongodb+srv://YOUR_USER:YOUR_PASSWORD@YOUR_CLUSTER/YOUR_DATABASE?retryWrites=true&w=majority
+PORT=5000
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+```
 
-4. Keep frontend/.env configured for local development:
+Set `VITE_API_URL` in `frontend/.env` (normally it remains `http://localhost:5000/api`):
 
-   VITE_API_URL=http://localhost:5000/api
+```dotenv
+VITE_API_URL=http://localhost:5000/api
+```
 
-5. In Command Prompt or the VS Code terminal, change to the project root and run:
+The backend refuses to start if `MONGODB_URI` is missing or Atlas cannot be reached. The `.env` files are ignored by Git. **Do not commit real credentials.**
 
-   npm run install:all
-   npm run dev
+## Install and run (Windows / VS Code)
 
-6. Open the frontend at:
-   http://localhost:5173
+1. Extract the ZIP and open the `applypilot-project` folder in VS Code.
+2. Confirm Node/npm are installed: `node -v` and `npm -v`.
+3. Create and fill both `.env` files as above.
+4. Open a terminal at the project root and install dependencies:
 
-7. Backend health endpoint:
-   http://localhost:5000/api/health
+```powershell
+npm install
+npm --prefix backend install
+npm --prefix frontend install
+```
 
-You can also install dependencies separately if necessary:
-   npm install
-   npm --prefix backend install
-   npm --prefix frontend install
+5. Before starting, replace the dummy `MONGODB_URI` in `backend/.env` with your test MongoDB Atlas connection string. Start both servers from the root:
 
-IMPORTANT: The MongoDB URI in .env.example is a placeholder. Replace it with a
-working test database URI before starting the backend. Never commit real
-credentials to GitHub. Commit .env.example files, not real .env files.
+```powershell
+npm run dev
+```
 
-AVAILABLE ROOT SCRIPTS
-----------------------
-  npm run dev             Starts backend and frontend together
-  npm run dev:backend     Starts backend in development mode
-  npm run dev:frontend    Starts Vite frontend in development mode
-  npm run install:all     Installs root, backend, and frontend dependencies
-  npm run build           Builds the frontend for production
-  npm test                Runs the backend's Node.js test command
+Or use two terminals:
 
-REST API ENDPOINTS
-------------------
-All API endpoints are prefixed with /api. Responses use a consistent structure:
-{ "success": boolean, "message": string, "data": object | array | null }
+```powershell
+# Terminal 1
+npm --prefix backend run dev
 
-GET     /api/health
-        Returns API and MongoDB connection status.
+# Terminal 2
+npm --prefix frontend run dev
+```
 
-POST    /api/applications
-        Creates an application. New applications start with Applied status.
+6. Open `http://localhost:5173`. The API is at `http://localhost:5000/api`; health check: `http://localhost:5000/api/health`.
+7. For a production frontend build: `npm --prefix frontend run build`.
 
-GET     /api/applications
-        Lists applications. Supports backend query parameters such as status,
-        company, sortBy, and order.
+## REST API
 
-GET     /api/applications/:id
-        Retrieves an application by its MongoDB document ID or generated ID.
+All responses use `{ "success": boolean, "message": string, "data": object | array | null }`.
 
-PUT     /api/applications/:id
-        Edits allowed fields: company, role, jobType, expectedSalary, and notes.
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/health` | Server and MongoDB connection status |
+| POST | `/api/applications` | Create an application; starts in Applied |
+| GET | `/api/applications` | List; accepts `status`, `company`, `sortBy`, `order` query parameters |
+| GET | `/api/applications/:id` | Get by MongoDB document ID or generated application ID |
+| PUT | `/api/applications/:id` | Edit whitelisted company, role, jobType, expectedSalary, notes fields |
+| PATCH | `/api/applications/:id/status` | Validated status transition |
+| DELETE | `/api/applications/:id` | Delete only in permitted statuses |
+| GET | `/api/analytics/summary` | Database-derived counts, conversion rates, recent applications, follow-ups |
 
-PATCH   /api/applications/:id/status
-        Attempts a status transition. The backend validates the workflow.
+### Example requests
 
-DELETE  /api/applications/:id
-        Deletes an application only when its status permits deletion.
+Create:
 
-GET     /api/analytics/summary
-        Returns database-derived status counts, conversion information, recent
-        applications, and follow-up information.
+```http
+POST /api/applications
+Content-Type: application/json
+```
 
-CORE BUSINESS RULES
--------------------
-- Application IDs are generated by the backend in the format JA-XXX-001.
-- ID sequence counters are stored in MongoDB and increment per normalized company.
-- The applied date cannot be in the future.
-- Each new application starts in Applied status.
-- Allowed transitions:
-    Applied   -> Interview or Rejected
-    Interview -> Offer or Rejected
-    Offer     -> Accepted or Declined
-    Rejected, Accepted, Declined are final statuses.
-- Status changes are recorded in status history with timestamps.
-- Follow-up date is seven days after the applied date.
-- An application still in Applied status after its follow-up date is overdue.
-- Duplicate active applications for the same company and role are rejected.
-- Application ID and applied date cannot be edited after creation.
-- Applications in Interview or Offer status cannot be deleted.
+```json
+{
+  "company": "Infosys",
+  "role": "Frontend Developer",
+  "jobType": "Full-time",
+  "appliedDate": "2026-10-20",
+  "expectedSalary": 85000,
+  "notes": "Recruiter referral"
+}
+```
 
-DEPLOYMENT SUMMARY
-------------------
-Backend on Render:
-- Create a Web Service connected to the GitHub repository.
-- Root Directory: backend
-- Build Command: npm install
-- Start Command: npm start
-- Set environment variables in Render's dashboard:
-    MONGODB_URI = your MongoDB Atlas connection string
-    NODE_ENV   = production
-    CLIENT_URL = the deployed Vercel frontend origin
-- Render provides the PORT environment variable to the service.
+The server generates `applicationId`, `status`, `statusHistory`, and `followUpDate`; clients cannot set these fields. Example response shape:
 
-Frontend on Vercel:
-- Import the GitHub repository as a Vercel project.
-- Root Directory: frontend
-- Framework preset: Vite
-- Build Command: npm run build
-- Output Directory: dist
-- Set environment variable:
-    VITE_API_URL = https://YOUR-RENDER-SERVICE.onrender.com/api
-- If client-side route refreshes return 404, configure a Vercel SPA rewrite to
-  send frontend routes to /index.html.
-- After deployment, set Render's CLIENT_URL to the exact deployed Vercel origin.
-- Redeploy after changing environment variables where required.
+```json
+{
+  "success": true,
+  "message": "Application created successfully.",
+  "data": {
+    "applicationId": "JA-INF-001",
+    "company": "Infosys",
+    "role": "Frontend Developer",
+    "status": "Applied",
+    "followUpDate": "2026-10-27T00:00:00.000Z",
+    "isOverdue": false,
+    "statusHistory": [{ "status": "Applied", "changedAt": "2026-10-20T00:00:00.000Z" }]
+  }
+}
+```
 
-SECURITY NOTES
---------------
-- Never place MongoDB credentials in frontend environment variables.
-- Do not commit real .env files or secrets to GitHub.
-- Use a dedicated test database user with limited permissions.
-- Configure Atlas network access deliberately; avoid opening access broadly unless
-  you understand the security implications.
-- VITE_ variables are exposed to the browser and must not contain secrets.
+The timestamps above illustrate the response shape; actual timestamps are generated by the server and date values depend on the submitted record.
 
-FINAL CHECKLIST
----------------
-[ ] Replace placeholder MongoDB credentials with a working test Atlas URI.
-[ ] Install dependencies and run the project locally.
-[ ] Test create, list, search, filter, edit, status changes, and delete rules.
-[ ] Test overdue follow-up and duplicate-application validation.
-[ ] Deploy backend and frontend and verify their URLs are connected.
-[ ] Add two real screenshots of the running application to the README.
-[ ] Push frontend and backend folders to the GitHub repository.
-[ ] Ensure no real secrets are committed.
+Change status:
 
-This file is a setup and deployment guide. Verify the live app and database
-connection in your own environment before submitting or sharing the project.
+```http
+PATCH /api/applications/65a000000000000000000000/status
+Content-Type: application/json
+```
+
+```json
+{ "status": "Interview" }
+```
+
+Example error:
+
+```json
+{
+  "success": false,
+  "message": "An active application already exists for this company and role.",
+  "data": null
+}
+```
+
+## Business rules
+
+### Application IDs
+
+- Format: `JA-<THREE-CHARACTER-COMPANY-PREFIX>-<THREE-DIGIT-SEQUENCE>`.
+- Prefix is derived from the first three alphanumeric characters of the company name, uppercased and padded with `X` if necessary (e.g. `A` → `AXX`).
+- Counter keys use a trimmed, case-insensitive, whitespace-normalized company name. Each normalized company has an independent counter.
+- `findOneAndUpdate` with `$inc` increments the MongoDB counter atomically. Deleting an application does not reuse its ID. If a counter exceeds 999, the sequence expands beyond three digits rather than wrapping.
+
+### Status workflow
+
+- `Applied → Interview` or `Rejected`
+- `Interview → Offer` or `Rejected`
+- `Offer → Accepted` or `Declined`
+- `Rejected`, `Accepted`, and `Declined` are final.
+
+Every successful transition is validated on the backend and appended to `statusHistory` with a server-generated timestamp. The standard edit endpoint cannot change status or history.
+
+### Duplicate detection
+
+Company names and roles are compared case-insensitively after trimming whitespace. Creating or editing into a matching company/role is rejected with HTTP 409 if another matching record is not in a final state. Records in `Rejected`, `Accepted`, or `Declined` do not block a new attempt. The check is application-level and can race when truly concurrent requests create the same pair; this implementation does not claim a database-enforced compound uniqueness guarantee.
+
+### Follow-ups and overdue policy
+
+- `followUpDate` is computed server-side as `appliedDate + 7 calendar days` using UTC date arithmetic.
+- An application is overdue only when its status is still `Applied` and the current UTC calendar date is later than the follow-up UTC calendar date. It is not marked overdue on the follow-up date itself.
+- Follow-up date is not editable and client-supplied values are ignored.
+
+### Editing and deleting
+
+- Editable: company, role, job type, expected salary, notes.
+- Immutable after creation: application ID and applied date. Status, follow-up date, and status history can only be changed by their designated backend logic.
+- Delete is allowed only in `Applied`, `Rejected`, `Accepted`, and `Declined`. `Interview` and `Offer` records cannot be deleted. Both the frontend and backend enforce this rule.
+
+### Analytics formulas
+
+- Interview conversion = applications whose current status is `Interview`, `Offer`, `Accepted`, or `Declined` ÷ all applications × 100.
+- Offer conversion = applications whose current status is `Offer`, `Accepted`, or `Declined` ÷ all applications × 100.
+- Offer acceptance = `Accepted` ÷ applications currently in `Offer`, `Accepted`, or `Declined` × 100.
+- Rates are rounded to whole percentages and return 0 when the denominator is zero. Because they use current status, these are pipeline conversion proxies, not a historical cohort analysis.
+
+## Testing and verification
+
+- `npm --prefix frontend run build` compiles the frontend.
+- `npm --prefix backend test` runs the backend's Node test runner (no live database integration suite is bundled).
+- Test manually with your Atlas URI and the API examples above. Verify future dates are rejected; IDs increment per normalized company; duplicate active pairs return 409; invalid transitions return 400; valid transitions append history; follow-up dates are seven days after applied dates; overdue is only true for Applied records after the due date; Interview/Offer deletion returns 400; and filters work via URL query parameters.
+- `GET /api/health` reports `database: connected` only when Mongoose is connected.
+
+**Verification status for this generated archive:** source files and configuration were created. The environment used to assemble the archive did not run npm dependency installation or connect to your private MongoDB Atlas cluster, so live database/API integration and browser screenshots are not claimed as tested. Run the checks above after supplying your own credentials.
+
+## Screenshots
+
+Actual screenshots are intentionally not fabricated. Start the configured app with your own records, then follow [`screenshots/README.md`](screenshots/README.md) to capture `screenshots/dashboard.png` and `screenshots/applications.png`.
+
+## GitHub workflow and suggested commits
+
+Initialize or connect your existing repository from the project root and make meaningful commits as you complete and verify each part:
+
+```bash
+git status
+git add .
+git commit -m "chore: create ApplyPilot project structure"
+# after backend and database integration
+git add backend
+git commit -m "feat: add MongoDB models and API foundation"
+# after CRUD and business-rule validation
+git add backend
+ git commit -m "feat: implement application workflow and validation"
+# after UI pages and API integration
+git add frontend
+ git commit -m "feat: build responsive dashboard and application management"
+# after final QA and docs
+git add README.md screenshots .gitignore package.json
+git commit -m "docs: add setup guide and final project polish"
+git push
+```
+
+Remove the leading space before `git commit` if copying those two indented lines into a strict shell. Review `git status` and inspect `.env` exclusion before pushing. No commits or pushes have been performed by this archive-generation process.
+
+## Troubleshooting
+
+- **Backend exits at startup:** check `backend/.env`, the URI, Atlas IP allowlist, database user permissions, and password URL encoding.
+- **Frontend cannot reach API:** confirm the backend is listening on port 5000 and `frontend/.env` has `VITE_API_URL=http://localhost:5000/api`; restart Vite after environment changes.
+- **CORS error:** ensure `CLIENT_URL` exactly matches the frontend origin (`http://localhost:5173`).
+- **Application date rejected:** future UTC calendar dates are rejected by design.
+- **Port in use:** change `PORT` in `backend/.env` and update `VITE_API_URL` only if the frontend API port changes.
+- **Atlas connection timeout:** check network access rules, cluster state, and outbound connectivity.
