@@ -1,6 +1,6 @@
 # ApplyPilot — Your Personal Career Command Center
 
-ApplyPilot is a MERN job application tracker with a focused “Midnight Orbit” interface. Track applications, follow-ups, status transitions, notes, and career-search analytics. All application records and per-company ID counters are stored in MongoDB Atlas; the frontend does not use mock records.
+ApplyPilot is a MERN job application tracker presented as **Fieldnote / Career**: an editorial, paper-and-ink career desk inspired by field journals and portfolio workspaces. It uses a warm mineral palette, serif headlines, mono-spaced metadata, a horizontal masthead, an illustrated opportunity map, and a six-lane pipeline board rather than a conventional dark sidebar dashboard. Track applications, follow-ups, status transitions, notes, and career-search analytics. All application records and per-company ID counters are stored in MongoDB Atlas; the frontend does not use mock application records.
 
 ## Features
 
@@ -11,7 +11,10 @@ ApplyPilot is a MERN job application tracker with a focused “Midnight Orbit”
 - Server-enforced status workflow and immutable status history timeline.
 - Follow-up date automatically set to seven calendar days after the applied date; overdue warnings for applications still in `Applied`.
 - Duplicate active application checks and form error feedback.
-- Follow-up Radar, CSV export, responsive layout, accessible labels/focus states, loading and error states.
+- Follow-up Radar with overdue emphasis, CSV export, responsive layouts, accessible labels/focus states, loading and error states.
+- Switchable six-stage Pipeline Board and compact Ledger view, with per-stage counts and quick record actions.
+- Weekly Fieldwork sprint: choose a weekly intention (3, 5, 8, or 10 actions) and log completed career actions. Progress persists in the browser for the current week; it is a personal planning aid, not an application record or backend metric.
+- Opportunity Map, conversion insight note, and rotating monthly visual motif for a more portfolio/editorial feel.
 - API health endpoint reporting MongoDB connectivity.
 
 ## Technology stack
